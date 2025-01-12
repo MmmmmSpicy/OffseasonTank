@@ -2,8 +2,6 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -59,7 +57,6 @@ public class RobotContainer {
 
         configureButtonBindings();
 
-        // Sends a dropdown for us to choose an auto in the Dashboard.
   }
   
 
@@ -75,8 +72,8 @@ public class RobotContainer {
         // Triangle4.onTrue(new);
         // leftShoulder5.onTrue(new);
         // rightShoulder6.onTrue(new);
-        leftTrigger7.onTrue(new ChangeSpeed(tankSubsystem, -10));
-        rightTrigger8.onTrue(new ChangeSpeed(tankSubsystem, 10));
+        X1.onTrue(new ChangeSpeed(tankSubsystem, -10));
+        O2.onTrue(new ChangeSpeed(tankSubsystem, 10));
         // leftStickPress9.onTrue(new);
         // rightStickPress10.onTrue(new);
         // dPadNorth.onTrue(new);

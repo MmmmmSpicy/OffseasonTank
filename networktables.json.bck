@@ -2,7 +2,7 @@
   {
     "name": "/Preferences/Speed Limit (Percent)",
     "type": "double",
-    "value": 100.0,
+    "value": 0.0,
     "properties": {
       "persistent": true
     }

@@ -45,12 +45,8 @@ public class TankSubsystem extends SubsystemBase {
         motorFollowerleft.configure(configFollowerleft, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         motorFollowerright.configure(configFollowerright, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-        Preferences.initDouble("Speed Limit (Percent)", Constants.limitPercent);
+        Preferences.initInt("Speed Limit (Percent)", Constants.limitPercent);
 
-        SmartDashboard.putNumber("Current Maximum Speed (Percent)", Constants.limitPercent);
-
-        SendableRegistry.addChild(robotDrive, motorLeaderleft);
-        SendableRegistry.addChild(robotDrive, motorLeaderright);
     }
 
     public void driveTank(double leftSpeed, double rightSpeed) {
@@ -69,16 +65,23 @@ public class TankSubsystem extends SubsystemBase {
     }
 
     public void speedChange(int amount) {
-        if (Constants.limitPercent + amount > 100) {
-            Constants.limitPercent = 100;
+        if (Preferences.getInt("Speed Limit (Percent)", 100) + amount > 100) {
+            Preferences.setInt("Speed Limit (Percent)", 100);
         }
         
-        else if (Constants.limitPercent + amount < 0) {
-            Constants.limitPercent = 0;
+        else if (Preferences.getInt("Speed Limit (Percent)", 100) + amount < 0) {
+            Preferences.setInt("Speed Limit (Percent)", 0);
         }
 
         else {
-            Constants.limitPercent = amount;
+            Preferences.setInt("Speed Limit (Percent)", amount);
         }
     }
+    
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("Current Maximum Speed (Percent)", Constants.limitPercent);
+        SendableRegistry.addChild(robotDrive, motorLeaderleft);
+        SendableRegistry.addChild(robotDrive, motorLeaderright);
+  }
 }
