@@ -4,80 +4,103 @@
 
 package frc.robot;
 
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
-
-import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
-/**
- * This is a demo program showing the use of the DifferentialDrive class. Runs the motors with
- * arcade steering.
- */
 public class Robot extends TimedRobot {
-  private final int idLeaderleft = 2;
-  private final int idLeaderright = 4;
-  private final int idFollowerleft = 1;
-  private final int idFollowerright = 3;
+  private Command m_autonomousCommand;
 
-  private final boolean rightInverted = true;
-  private final boolean leftInverted = false;
+  private RobotContainer m_robotContainer;
 
-  private final SparkMax motorLeaderleft = new SparkMax(idLeaderleft, MotorType.kBrushless);
-  private final SparkMax motorLeaderright = new SparkMax(idLeaderright, MotorType.kBrushless);
-  private final SparkMax motorFollowerleft = new SparkMax(idFollowerleft, MotorType.kBrushless);
-  private final SparkMax motorFollowerright = new SparkMax(idFollowerright, MotorType.kBrushless);
-
-  private final SparkMaxConfig configLeaderleft = new SparkMaxConfig();
-  private final SparkMaxConfig configLeaderright = new SparkMaxConfig();
-  private final SparkMaxConfig configFollowerleft = new SparkMaxConfig();
-  private final SparkMaxConfig configFollowerright = new SparkMaxConfig();
-
-
-  private final DifferentialDrive robotDrive =
-      new DifferentialDrive(motorLeaderleft::set, motorLeaderright::set);
-  private final Joystick stick = new Joystick(0);
-
-  public Robot() {
-    SendableRegistry.addChild(robotDrive, motorLeaderleft);
-    SendableRegistry.addChild(robotDrive, motorLeaderright);
-  }
-
+  /**
+   * This function is run when the robot is first started up and should be used
+   * for any
+   * initialization code.
+   */
   @Override
   public void robotInit() {
-    // We need to invert one side of the drivetrain so that positive voltages
-    // result in both sides moving forward. Depending on how your robot's
-    // gearbox is constructed, you might have to invert the left side instead.
+      // Instantiate our RobotContainer. This will perform all our button bindings,
+      // and put our
+      // autonomous chooser on the dashboard.
+      m_robotContainer = new RobotContainer();
+  }
 
-    configLeaderright.inverted(leftInverted);
-    configFollowerright.inverted(rightInverted);
-    
-    configFollowerleft.follow(idLeaderleft);
-    configFollowerright.follow(idLeaderright);
-    
-    configLeaderleft.idleMode(IdleMode.kBrake);
-    configLeaderright.idleMode(IdleMode.kBrake);
-    configFollowerleft.idleMode(IdleMode.kBrake);
-    configFollowerright.idleMode(IdleMode.kBrake);
+  /**
+   * This function is called every robot packet, no matter the mode. Use this for
+   * items like
+   * diagnostics that you want ran during disabled, autonomous, teleoperated and
+   * test.
+   *
+   * <p>
+   * This runs after the mode specific periodic functions, but before LiveWindow
+   * and
+   * SmartDashboard integrated updating.
+   */
+  @Override
+  public void robotPeriodic() {
+      // Runs the Scheduler. This is responsible for polling buttons, adding
+      // newly-scheduled
+      // commands, running already-scheduled commands, removing finished or
+      // interrupted commands,
+      // and running subsystem periodic() methods. This must be called from the
+      // robot's periodic
+      // block in order for anything in the Command-based framework to work.
+      CommandScheduler.getInstance().run();
+  }
 
-    motorLeaderleft.configure(configLeaderleft, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    motorLeaderright.configure(configLeaderright, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    motorFollowerleft.configure(configFollowerleft, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    motorFollowerright.configure(configFollowerright, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
+  /** This function is called once each time the robot enters Disabled mode. */
+  @Override
+  public void disabledInit() {
   }
 
   @Override
+  public void disabledPeriodic() {
+  }
+
+  /**
+   * This autonomous runs the autonomous command selected by your
+   * {@link RobotContainer} class.
+   */
+  @Override
+  public void autonomousInit() {
+      m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+
+      // schedule the autonomous command (example)
+      if (m_autonomousCommand != null) {
+          m_autonomousCommand.schedule();
+      }
+  }
+
+  /** This function is called periodically during autonomous. */
+  @Override
+  public void autonomousPeriodic() {
+  }
+
+  @Override
+  public void teleopInit() {
+      // This makes sure that the autonomous stops running when
+      // teleop starts running. If you want the autonomous to
+      // continue until interrupted by another command, remove
+      // this line or comment it out.
+      if (m_autonomousCommand != null) {
+          m_autonomousCommand.cancel();
+      }
+  }
+
+  /** This function is called periodically during operator control. */
+  @Override
   public void teleopPeriodic() {
-    // Drive with arcade drive.
-    // That means that the Y axis drives forward
-    // and backward, and the X turns left and right.
-    robotDrive.tankDrive(-stick.getRawAxis(1) / 1.0, -stick.getRawAxis(5) / 1.0);
+  }
+
+  @Override
+  public void testInit() {
+      // Cancels all running commands at the start of test mode.
+      CommandScheduler.getInstance().cancelAll();
+  }
+
+  /** This function is called periodically during test mode. */
+  @Override
+  public void testPeriodic() {
   }
 }
