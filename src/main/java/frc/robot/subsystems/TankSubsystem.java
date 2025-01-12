@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import java.lang.Math;
 
 public class TankSubsystem extends SubsystemBase {
     private final SparkMax motorLeaderleft = new SparkMax(Constants.idLeaderleft, MotorType.kBrushless);
@@ -45,16 +46,18 @@ public class TankSubsystem extends SubsystemBase {
         motorFollowerleft.configure(configFollowerleft, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         motorFollowerright.configure(configFollowerright, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-        Preferences.initInt("Speed Limit (Percent)", Constants.limitPercent);
+        Preferences.initDouble("Speed Limit (Percent)", Constants.limitPercent);
 
     }
 
     public void driveTank(double leftSpeed, double rightSpeed) {
-        robotDrive.tankDrive(-leftSpeed * (Constants.limitPercent/100), -rightSpeed * (Constants.limitPercent/100));
+        robotDrive.tankDrive(-leftSpeed * (Math.sqrt((Preferences.getDouble("Speed Limit (Percent)", 100)) / 100.0)),
+                            -rightSpeed * (Math.sqrt((Preferences.getDouble("Speed Limit (Percent)", 100)) / 100.0)));
     }
 
     public void driveArcade(double xSpeed, double rotSpeed) {
-        robotDrive.arcadeDrive(-xSpeed * (Constants.limitPercent/100), -rotSpeed * (Constants.limitPercent/100));
+        robotDrive.arcadeDrive(-xSpeed * (Math.sqrt((Preferences.getDouble("Speed Limit (Percent)", 100)) / 100.0)),
+                            -rotSpeed * (Math.sqrt((Preferences.getDouble("Speed Limit (Percent)", 100)) / 100.0)));
     }
 
     public void stop() {
@@ -65,16 +68,16 @@ public class TankSubsystem extends SubsystemBase {
     }
 
     public void speedChange(int amount) {
-        if (Preferences.getInt("Speed Limit (Percent)", 100) + amount > 100) {
-            Preferences.setInt("Speed Limit (Percent)", 100);
+        if ((Preferences.getDouble("Speed Limit (Percent)", 100) + amount) > 100) {
+            Preferences.setDouble("Speed Limit (Percent)", 100);
         }
         
-        else if (Preferences.getInt("Speed Limit (Percent)", 100) + amount < 0) {
-            Preferences.setInt("Speed Limit (Percent)", 0);
+        else if ((Preferences.getDouble("Speed Limit (Percent)", 100) + amount) < 0) {
+            Preferences.setDouble("Speed Limit (Percent)", 0);
         }
 
         else {
-            Preferences.setInt("Speed Limit (Percent)", amount);
+            Preferences.setDouble("Speed Limit (Percent)", (Preferences.getDouble("Speed Limit (Percent)", 100) + amount));
         }
     }
     
